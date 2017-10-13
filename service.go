@@ -17,26 +17,25 @@ type Service struct {
 	Namespace      string
 	Name           string
 	Version        int
+	Protocol       string
+}
+
+// getProtocol - Get the transfer protocol to use for the service
+func (s *Service) getProtocol() string {
+	switch s.Protocol {
+	case config.ProtocolHTTP, config.ProtocolHTTPS:
+		return s.Protocol
+	default:
+		return config.ProtocolHTTPS
+	}
 }
 
 // Call - Do the current service request.
-//
-// Return:
-//     *http.Response - The response of the request.
-//     error - An error if it occurred.
 func (s *Service) Call() (*http.Response, error) {
 	return http.DefaultClient.Do(s.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
-//
-// Params:
-//     method string - The HTTP method to use for the request.
-//     resource string - The service resource we want to request.
-//     body io.Reader - The body to pass to the request. Can be nil.
-//
-// Return:
-//     error - An error if it occurred.
 func (s *Service) Dial(request *Request) error {
 	var err error
 
@@ -56,15 +55,15 @@ func (s *Service) Dial(request *Request) error {
 	dnsName := domain.BuildServiceDNSName(s.Name, s.Branch, s.Environment, serviceNamespace)
 
 	// Build the resource URL.
-	resourceURL := fmt.Sprintf("%s://%s/%s", config.ProtocolHTTP, dnsName, request.Resource)
+	resourceUrl := fmt.Sprintf("%s://%s/%s", config.ProtocolHTTP, dnsName, request.Resource)
 
 	// Append the query string if we have any.
 	if len(request.Query) > 0 {
-		resourceURL = fmt.Sprintf("%s?%s", resourceURL, request.Query.Encode())
+		resourceUrl = fmt.Sprintf("%s?%s", resourceUrl, request.Query.Encode())
 	}
 
 	// Create the request.
-	s.CurrentRequest, err = http.NewRequest(request.Method, resourceURL, request.Body)
+	s.CurrentRequest, err = http.NewRequest(request.Method, resourceUrl, request.Body)
 	if err != nil {
 		return err
 	}
