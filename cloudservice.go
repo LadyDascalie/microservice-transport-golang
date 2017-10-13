@@ -90,10 +90,10 @@ func (c *CloudService) GetApiGatewayUrl(request *Request) string {
 
 	// Fallback to constructing the URL ourselves.
 	if c.Environment == "staging" {
-		return fmt.Sprintf("%s://%s-%s.%s", request.Protocol, config.GetGatewayUri(), c.Environment, config.GetServiceDomain())
+		return fmt.Sprintf("%s://%s-%s.%s", request.getProtocol(), config.GetGatewayUri(), c.Environment, config.GetServiceDomain())
 	}
 
-	return fmt.Sprintf("%s://%s.%s", request.Protocol, config.GetGatewayUri(), config.GetServiceDomain())
+	return fmt.Sprintf("%s://%s.%s", request.getProtocol(), config.GetGatewayUri(), config.GetServiceDomain())
 }
 
 // Call - Do the current service request.

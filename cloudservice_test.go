@@ -278,6 +278,68 @@ func TestCloudService_Dial(t *testing.T) {
 	}
 }
 
+func TestCloudService_GetApiGatewayUrl(t *testing.T) {
+	tt := []struct {
+		name               string
+		gatewayUrl         string
+		gatewayUri         string
+		serviceDomain      string
+		expectedGatewayUrl string
+	}{
+		{
+			name:               "Just URL",
+			gatewayUrl:         "https://api-gateway.test.com",
+			expectedGatewayUrl: "https://api-gateway.test.com",
+		},
+		{
+			name:               "Just URI + domain",
+			gatewayUri:         "api-gateway",
+			serviceDomain:      "test.com",
+			expectedGatewayUrl: "https://api-gateway-staging.test.com",
+		},
+		{
+			name:               "URL + URI + domain",
+			gatewayUrl:         "https://api-gateway.wibble.com",
+			gatewayUri:         "api-gateway",
+			serviceDomain:      "test.com",
+			expectedGatewayUrl: "https://api-gateway.wibble.com",
+		},
+	}
+
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodGet,
+		Resource: "things",
+	}
+
+	for _, tc := range tt {
+		os.Setenv("SOA_DOMAIN", tc.serviceDomain)
+		os.Setenv("SOA_GATEWAY_URI", tc.gatewayUri)
+		os.Setenv("SOA_GATEWAY_URL", tc.gatewayUrl)
+
+		t.Run(tc.name, func(t *testing.T) {
+			actualGatewayUrl := myService.GetApiGatewayUrl(myServiceThingsRequest)
+			if actualGatewayUrl != tc.expectedGatewayUrl {
+				t.Errorf("TestCloudService_GetApiGatewayUrl: %s: expected %v got %v", tc.name, tc.expectedGatewayUrl, actualGatewayUrl)
+			}
+		})
+	}
+}
+
 func ExampleCloudService_Dial() {
 	// Instantiate the service.
 	myService := &CloudService{
