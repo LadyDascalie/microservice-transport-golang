@@ -18,6 +18,15 @@ Install the package as normal:
 $ go get -u github.com/LUSHDigital/microservice-transport-golang
 ```
 
+## Configuration
+There are a few environment variables that can be used to configure this package.
+
+| Variable          | Description                                                                                      |
+|-------------------|--------------------------------------------------------------------------------------------------|
+| `SOA_DOMAIN`      | Top level domain of the service environment. Used to build the API gateway URL.                  |
+| `SOA_GATEWAY_URI` | URI of the API gateway e.g. api-gateway                                                          |
+| `SOA_GATEWAY_URL` | Full URL (uri + domain) of the API gateway. Overrides `SOA_DOMAIN` and `SOA_GATEWAY_URI` if set. |
+
 ## Documentation
 * [General](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang)
 * [Config](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang/config)

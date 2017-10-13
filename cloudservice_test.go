@@ -277,3 +277,90 @@ func TestCloudService_Dial(t *testing.T) {
 		})
 	}
 }
+
+func ExampleCloudService_Dial() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodGet,
+		Resource: "things",
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
+func ExampleCloudService_Call() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodGet,
+		Resource: "things",
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
