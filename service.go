@@ -11,23 +11,12 @@ import (
 
 // Service - Responsible for communication with a service.
 type Service struct {
-	Branch         string
-	CurrentRequest *http.Request
-	Environment    string
-	Namespace      string
-	Name           string
-	Version        int
-	Protocol       string
-}
-
-// getProtocol - Get the transfer protocol to use for the service
-func (s *Service) getProtocol() string {
-	switch s.Protocol {
-	case config.ProtocolHTTP, config.ProtocolHTTPS:
-		return s.Protocol
-	default:
-		return config.ProtocolHTTPS
-	}
+	Branch         string        // VCS branch the service is built from.
+	CurrentRequest *http.Request // Current HTTP request being actioned.
+	Environment    string        // CI environment the service operates in.
+	Namespace      string        // Namespace of the service.
+	Name           string        // Name of the service.
+	Version        int           // Major API version of the service.
 }
 
 // Call - Do the current service request.
@@ -55,7 +44,7 @@ func (s *Service) Dial(request *Request) error {
 	dnsName := domain.BuildServiceDNSName(s.Name, s.Branch, s.Environment, serviceNamespace)
 
 	// Build the resource URL.
-	resourceUrl := fmt.Sprintf("%s://%s/%s", config.ProtocolHTTP, dnsName, request.Resource)
+	resourceUrl := fmt.Sprintf("%s://%s/%s", request.getProtocol(), dnsName, request.Resource)
 
 	// Append the query string if we have any.
 	if len(request.Query) > 0 {

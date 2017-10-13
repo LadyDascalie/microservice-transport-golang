@@ -36,3 +36,8 @@ func GetServiceDomain() string {
 func GetGatewayUri() string {
 	return os.Getenv("SOA_GATEWAY_URI")
 }
+
+// GetGatewayUri - Get the URL of the API gateway.
+func GetGatewayUrl() string {
+	return os.Getenv("SOA_GATEWAY_URL")
+}

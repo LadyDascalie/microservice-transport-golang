@@ -3,17 +3,16 @@ package microservicetransport
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
-	"strings"
-
 	"strconv"
+	"strings"
 
 	"github.com/LUSHDigital/microservice-core-golang/response"
 	"github.com/LUSHDigital/microservice-transport-golang/config"
 	"github.com/LUSHDigital/microservice-transport-golang/domain"
 	"github.com/LUSHDigital/microservice-transport-golang/models"
-	"github.com/pkg/errors"
 )
 
 // AuthCredentials - Credentials needed to authenticate for a cloud service.
@@ -24,18 +23,18 @@ type AuthCredentials struct {
 
 // CloudService - Responsible for communication with a cloud service.
 type CloudService struct {
-	Service
-	Credentials *AuthCredentials
+	Service                      // Inherit all properties of a normal service.
+	Credentials *AuthCredentials // Authentication credentials for cloud service calls.
 }
 
 // authenticate - Authenticate against the API gateway and return an auth token.
-func (c *CloudService) authenticate() (*models.Token, error) {
+func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 	loginBody := new(bytes.Buffer)
 	if err := json.NewEncoder(loginBody).Encode(c.Credentials); err != nil {
 		return nil, fmt.Errorf("cannot encode json: %s", err)
 	}
 
-	loginReq, err := http.NewRequest(http.MethodPost, c.GetApiGatewayUrl(), loginBody)
+	loginReq, err := http.NewRequest(http.MethodPost, c.GetApiGatewayUrl(request), loginBody)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build login request: %s", err)
 	}
@@ -82,12 +81,18 @@ func (c *CloudService) authenticate() (*models.Token, error) {
 }
 
 // GetApiGatewayUrl - Get the url of the API gateway.
-func (c *CloudService) GetApiGatewayUrl() string {
-	if c.Environment == "staging" {
-		return fmt.Sprintf("%s-%s.%s", config.GetGatewayUri(), c.Environment, config.GetServiceDomain())
+func (c *CloudService) GetApiGatewayUrl(request *Request) string {
+	// Check if a full URL is set in the environment.
+	if config.GetGatewayUrl() != "" {
+		return config.GetGatewayUrl()
 	}
 
-	return fmt.Sprintf("%s.%s", config.GetGatewayUri(), config.GetServiceDomain())
+	// Fallback to constructing the URL ourselves.
+	if c.Environment == "staging" {
+		return fmt.Sprintf("%s://%s-%s.%s", request.Protocol, config.GetGatewayUri(), c.Environment, config.GetServiceDomain())
+	}
+
+	return fmt.Sprintf("%s://%s.%s", request.Protocol, config.GetGatewayUri(), config.GetServiceDomain())
 }
 
 // Call - Do the current service request.
@@ -101,7 +106,7 @@ func (c *CloudService) Dial(request *Request) error {
 		return errors.New("cannot authenticate for cloud service: missing credentials")
 	}
 
-	token, err := c.authenticate()
+	token, err := c.authenticate(request)
 	if err != nil {
 		return fmt.Errorf("cannot authenticate for cloud service: %s", err)
 	}
@@ -112,13 +117,7 @@ func (c *CloudService) Dial(request *Request) error {
 		c.Name = strings.Join([]string{config.AggregatorDomainPrefix, c.Name}, "-")
 	}
 
-	// Determine the service namespace to use based on the service version.
-	serviceNamespace := c.Name
-	if c.Version != 0 {
-		serviceNamespace = fmt.Sprintf("%s-%d", serviceNamespace, c.Version)
-	}
-
-	cloudServiceUrl := domain.BuildCloudServiceUrl(c.getProtocol(), c.GetApiGatewayUrl(), serviceNamespace, c.Name)
+	cloudServiceUrl := domain.BuildCloudServiceUrl(c.GetApiGatewayUrl(request), c.Namespace, c.Name)
 
 	// Build the resource URL.
 	resourceUrl := fmt.Sprintf("%s/%s", cloudServiceUrl, request.Resource)

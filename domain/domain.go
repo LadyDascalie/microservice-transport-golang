@@ -8,6 +8,6 @@ func BuildServiceDNSName(service, branch, environment, serviceNamespace string) 
 }
 
 // BuildCloudServiceUrl - Build the full URL for a cloud service.
-func BuildCloudServiceUrl(protocol, apiGatewayUrl, serviceNamespace, serviceName string) string {
-	return fmt.Sprintf("%s://%s/%s/%s", protocol, apiGatewayUrl, serviceNamespace, serviceName)
+func BuildCloudServiceUrl(apiGatewayUrl, serviceNamespace, serviceName string) string {
+	return fmt.Sprintf("%s/%s/%s", apiGatewayUrl, serviceNamespace, serviceName)
 }
