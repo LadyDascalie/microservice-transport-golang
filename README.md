@@ -31,4 +31,5 @@ There are a few environment variables that can be used to configure this package
 * [General](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang)
 * [Config](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang/config)
 * [Domain](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang/domain)
+* [Errors](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang/errors)
 * [Models](https://godoc.org/github.com/LUSHDigital/microservice-transport-golang/models)

@@ -1,4 +1,4 @@
-package microservicetransport
+package errors
 
 // LoginUnauthorisedError - Error to throw when a login was unauthorised.
 type LoginUnauthorisedError struct{}

@@ -12,6 +12,7 @@ import (
 	"github.com/LUSHDigital/microservice-core-golang/response"
 	"github.com/LUSHDigital/microservice-transport-golang/config"
 	"github.com/LUSHDigital/microservice-transport-golang/domain"
+	transportErrors "github.com/LUSHDigital/microservice-transport-golang/errors"
 	"github.com/LUSHDigital/microservice-transport-golang/models"
 )
 
@@ -55,7 +56,7 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 	switch loginResp.StatusCode {
 	// Custom error for login failed.
 	case http.StatusUnauthorized, http.StatusNotFound:
-		return nil, LoginUnauthorisedError{}
+		return nil, transportErrors.LoginUnauthorisedError{}
 
 	// 200 and 304 are all good.
 	case http.StatusOK, http.StatusNotModified:
@@ -74,7 +75,7 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 	}
 
 	if len(consumer.Tokens) == 0 {
-		return nil, ConsumerHasNoTokensError{}
+		return nil, transportErrors.ConsumerHasNoTokensError{}
 	}
 
 	return consumer.Tokens[0], nil
