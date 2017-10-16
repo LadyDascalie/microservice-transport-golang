@@ -3,6 +3,7 @@ package microservicetransport
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"testing"
@@ -184,7 +185,7 @@ func TestService_Dial(t *testing.T) {
 				postBody := new(bytes.Buffer)
 				json.NewEncoder(postBody).Encode(tc.postData)
 
-				tc.request.Body = postBody
+				tc.request.Body = ioutil.NopCloser(postBody)
 			}
 
 			err := tc.service.Dial(tc.request)

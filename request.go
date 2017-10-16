@@ -9,11 +9,11 @@ import (
 
 // Request - Models a request to a service.
 type Request struct {
-	Body     io.Reader  // Body to pass in the request.
-	Method   string     // HTTP method/verb for the request.
-	Query    url.Values // Query string values.
-	Resource string     // Endpoint/resource on the requested service.
-	Protocol string     // Transfer protocol to access the service with.
+	Body     io.ReadCloser // Body to pass in the request.
+	Method   string        // HTTP method/verb for the request.
+	Query    url.Values    // Query string values.
+	Resource string        // Endpoint/resource on the requested service.
+	Protocol string        // Transfer protocol to access the service with.
 }
 
 // getProtocol - Get the transfer protocol to use for the service

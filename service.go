@@ -53,9 +53,5 @@ func (s *Service) Dial(request *Request) error {
 
 	// Create the request.
 	s.CurrentRequest, err = http.NewRequest(request.Method, resourceUrl, request.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	"github.com/LUSHDigital/microservice-transport-golang/config"
 )
 
@@ -14,5 +12,5 @@ type Token struct {
 
 // PrepareForRequest - Prepare a token for use with a http request.
 func (t *Token) PrepareForHttp() string {
-	return fmt.Sprintf("%s%s", config.AuthHeaderPrefix, t.Value)
+	return config.AuthHeaderPrefix + t.Value
 }
