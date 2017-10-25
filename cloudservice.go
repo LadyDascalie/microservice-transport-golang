@@ -40,7 +40,7 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 		return nil, fmt.Errorf("cannot build login request: %s", err)
 	}
 
-	loginResp, err := http.DefaultClient.Do(loginReq)
+	loginResp, err := HTTPClient.Do(loginReq)
 	if err != nil {
 		return nil, fmt.Errorf("cannot perform login request: %s", err)
 	}
@@ -98,7 +98,7 @@ func (c *CloudService) GetApiGatewayUrl(request *Request) string {
 
 // Call - Do the current service request.
 func (c *CloudService) Call() (*http.Response, error) {
-	return http.DefaultClient.Do(c.CurrentRequest)
+	return client.Do(c.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
