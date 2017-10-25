@@ -98,7 +98,7 @@ func (c *CloudService) GetApiGatewayUrl(request *Request) string {
 
 // Call - Do the current service request.
 func (c *CloudService) Call() (*http.Response, error) {
-	return client.Do(c.CurrentRequest)
+	return HTTPClient.Do(c.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
