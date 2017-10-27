@@ -28,6 +28,19 @@ type CloudService struct {
 	Credentials *AuthCredentials // Authentication credentials for cloud service calls.
 }
 
+// NewCloudService - Prepare a new CloudService struct with the provided parameters.
+func NewCloudService(branch, env, namespace, name string, credentials *AuthCredentials) *CloudService {
+	return &CloudService{
+		Service: Service{
+			Branch:      branch,
+			Environment: env,
+			Namespace:   namespace,
+			Name:        name,
+		},
+		Credentials: credentials,
+	}
+}
+
 // authenticate - Authenticate against the API gateway and return an auth token.
 func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 	loginBody := new(bytes.Buffer)
