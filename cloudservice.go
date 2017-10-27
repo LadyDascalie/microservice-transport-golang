@@ -28,7 +28,7 @@ type CloudService struct {
 	Credentials *AuthCredentials // Authentication credentials for cloud service calls.
 }
 
-// NewCloudService - Prepare a new CloudService struct with the provided parameters
+// NewCloudService - Prepare a new CloudService struct with the provided parameters.
 func NewCloudService(branch, env, namespace, name string, credentials *AuthCredentials) *CloudService {
 	return &CloudService{
 		Service: Service{
