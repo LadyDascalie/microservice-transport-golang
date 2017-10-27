@@ -21,7 +21,7 @@ type Service struct {
 
 // Call - Do the current service request.
 func (s *Service) Call() (*http.Response, error) {
-	return http.DefaultClient.Do(s.CurrentRequest)
+	return HTTPClient.Do(s.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
