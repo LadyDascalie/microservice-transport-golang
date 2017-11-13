@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/LUSHDigital/microservice-transport-golang)](https://goreportcard.com/report/github.com/LUSHDigital/microservice-transport-golang)
+
 # Lush Digital - Microservice Transport (Golang)
 A set of convenience structs and interfaces for simplifying transport of data between microservices
 
