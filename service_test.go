@@ -206,8 +206,8 @@ func TestService_Dial(t *testing.T) {
 
 func TestService_GetName(t *testing.T) {
 	tt := []struct {
-		name           string
-		service        Service
+		name         string
+		service      Service
 		expectedName string
 	}{
 		{

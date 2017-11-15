@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/LUSHDigital/microservice-core-golang/response"
-	transportErrors "github.com/LUSHDigital/microservice-transport-golang/errors"
 	"github.com/LUSHDigital/microservice-transport-golang/config"
 	"github.com/LUSHDigital/microservice-transport-golang/domain"
+	transportErrors "github.com/LUSHDigital/microservice-transport-golang/errors"
 	"github.com/LUSHDigital/microservice-transport-golang/models"
 )
 
@@ -48,7 +48,7 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 		return nil, fmt.Errorf("cannot encode json: %s", err)
 	}
 
-	loginReq, err := http.NewRequest(http.MethodPost, c.GetApiGatewayUrl(request), loginBody)
+	loginReq, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/%s", c.GetApiGatewayUrl(request), "login"), loginBody)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build login request: %s", err)
 	}
