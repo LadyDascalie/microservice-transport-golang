@@ -279,6 +279,55 @@ func TestCloudService_Dial(t *testing.T) {
 	}
 }
 
+func TestCloudService_GetName(t *testing.T) {
+	tt := []struct {
+		name         string
+		service      CloudService
+		expectedName string
+	}{
+		{
+			name: "Normal",
+			service: CloudService{
+				Service: Service{
+					Branch:      "master",
+					Environment: "staging",
+					Namespace:   "services",
+					Name:        "myservice",
+				},
+				Credentials: &AuthCredentials{
+					Email:    "test@test.com",
+					Password: "1234",
+				},
+			},
+			expectedName: "myservice",
+		},
+		{
+			name: "Crazy",
+			service: CloudService{
+				Service: Service{
+					Branch:      "massdsdfsdjf89uter",
+					Environment: "sdfsdf34341",
+					Namespace:   "l1j2312klj3k21j3",
+					Name:        "-sf9s9f9ds0f9-",
+				},
+				Credentials: &AuthCredentials{
+					Email:    "test@test.com",
+					Password: "1234",
+				},
+			},
+			expectedName: "-sf9s9f9ds0f9-",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.service.GetName() != tc.expectedName {
+				t.Errorf("TestService_GetName: %s: expected %v got %v", tc.name, tc.expectedName, tc.service.GetName())
+			}
+		})
+	}
+}
+
 func TestCloudService_GetApiGatewayUrl(t *testing.T) {
 	tt := []struct {
 		name               string

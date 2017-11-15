@@ -204,6 +204,43 @@ func TestService_Dial(t *testing.T) {
 	}
 }
 
+func TestService_GetName(t *testing.T) {
+	tt := []struct {
+		name           string
+		service        Service
+		expectedName string
+	}{
+		{
+			name: "Normal",
+			service: Service{
+				Branch:      "master",
+				Environment: "staging",
+				Namespace:   "services",
+				Name:        "myservice",
+			},
+			expectedName: "myservice",
+		},
+		{
+			name: "Crazy",
+			service: Service{
+				Branch:      "massdsdfsdjf89uter",
+				Environment: "sdfsdf34341",
+				Namespace:   "l1j2312klj3k21j3",
+				Name:        "-sf9s9f9ds0f9-",
+			},
+			expectedName: "-sf9s9f9ds0f9-",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.service.GetName() != tc.expectedName {
+				t.Errorf("TestService_GetName: %s: expected %v got %v", tc.name, tc.expectedName, tc.service.GetName())
+			}
+		})
+	}
+}
+
 func ExampleService_Dial() {
 	// Instantiate the service.
 	myService := &Service{

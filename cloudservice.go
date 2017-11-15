@@ -10,9 +10,9 @@ import (
 	"strings"
 
 	"github.com/LUSHDigital/microservice-core-golang/response"
+	transportErrors "github.com/LUSHDigital/microservice-transport-golang/errors"
 	"github.com/LUSHDigital/microservice-transport-golang/config"
 	"github.com/LUSHDigital/microservice-transport-golang/domain"
-	transportErrors "github.com/LUSHDigital/microservice-transport-golang/errors"
 	"github.com/LUSHDigital/microservice-transport-golang/models"
 )
 
@@ -157,4 +157,9 @@ func (c *CloudService) Dial(request *Request) error {
 	}
 
 	return nil
+}
+
+// Dial - Get the name of the service
+func (c *CloudService) GetName() string {
+	return c.Name
 }

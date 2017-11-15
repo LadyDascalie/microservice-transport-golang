@@ -55,3 +55,8 @@ func (s *Service) Dial(request *Request) error {
 	s.CurrentRequest, err = http.NewRequest(request.Method, resourceUrl, request.Body)
 	return err
 }
+
+// Dial - Get the name of the service
+func (s *Service) GetName() string {
+	return s.Name
+}
