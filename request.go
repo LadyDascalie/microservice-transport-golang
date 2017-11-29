@@ -22,6 +22,6 @@ func (r *Request) getProtocol() string {
 	case config.ProtocolHTTP, config.ProtocolHTTPS:
 		return r.Protocol
 	default:
-		return config.ProtocolHTTPS
+		return config.ProtocolHTTP
 	}
 }
