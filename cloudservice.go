@@ -156,6 +156,11 @@ func (c *CloudService) Dial(request *Request) error {
 		c.CurrentRequest.Header.Set(config.ServiceVersionHeader, strconv.Itoa(c.Version))
 	}
 
+	// Add the headers.
+	for _, header := range request.Headers {
+		c.CurrentRequest.Header.Set(header.Key, header.Value)
+	}
+
 	return nil
 }
 

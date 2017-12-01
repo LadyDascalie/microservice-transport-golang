@@ -53,6 +53,12 @@ func (s *Service) Dial(request *Request) error {
 
 	// Create the request.
 	s.CurrentRequest, err = http.NewRequest(request.Method, resourceUrl, request.Body)
+
+	// Add the headers.
+	for _, header := range request.Headers {
+		s.CurrentRequest.Header.Set(header.Key, header.Value)
+	}
+
 	return err
 }
 

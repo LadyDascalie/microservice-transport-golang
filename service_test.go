@@ -176,6 +176,35 @@ func TestService_Dial(t *testing.T) {
 			},
 			expectedUrl: "https://myservice-master-staging.myservice/things?baz=qux&foo=bar",
 		},
+		{
+			name: "POST with headers",
+			service: Service{
+				Branch:      "master",
+				Environment: "staging",
+				Namespace:   "services",
+				Name:        "myservice",
+			},
+			postData: map[string]string{
+				"foo": "bar",
+				"baz": "qux",
+			},
+			request: &Request{
+				Method:   http.MethodPost,
+				Resource: "things",
+				Protocol: config.ProtocolHTTPS,
+				Headers: []Header{
+					{
+						Key:   "Content-Type",
+						Value: "application/json",
+					},
+					{
+						Key:   "Accept-Language",
+						Value: "en-GB",
+					},
+				},
+			},
+			expectedUrl: "https://myservice-master-staging.myservice/things",
+		},
 	}
 
 	for _, tc := range tt {
@@ -199,6 +228,12 @@ func TestService_Dial(t *testing.T) {
 
 			if tc.service.CurrentRequest.URL.String() != tc.expectedUrl {
 				t.Errorf("TestService_Dial: %s: expected %v got %v", tc.name, tc.expectedUrl, tc.service.CurrentRequest.URL.String())
+			}
+
+			for _, header := range tc.request.Headers {
+				if header.Value != tc.service.CurrentRequest.Header.Get(header.Key) {
+					t.Errorf("TestService_Dial: %s: expected %v got %v", tc.name, header.Value, tc.service.CurrentRequest.Header.Get(header.Key))
+				}
 			}
 		})
 	}

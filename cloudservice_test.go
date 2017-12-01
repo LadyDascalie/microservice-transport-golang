@@ -345,7 +345,7 @@ func TestCloudService_GetApiGatewayUrl(t *testing.T) {
 			name:               "Just URI + domain",
 			gatewayUri:         "api-gateway",
 			serviceDomain:      "test.com",
-			expectedGatewayUrl: "https://api-gateway-staging.test.com",
+			expectedGatewayUrl: "http://api-gateway-staging.test.com",
 		},
 		{
 			name:               "URL + URI + domain",
