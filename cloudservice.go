@@ -157,8 +157,8 @@ func (c *CloudService) Dial(request *Request) error {
 	}
 
 	// Add the headers.
-	for _, header := range request.Headers {
-		c.CurrentRequest.Header.Set(header.Key, header.Value)
+	for key, value := range request.Headers {
+		c.CurrentRequest.Header.Set(key, value)
 	}
 
 	return nil

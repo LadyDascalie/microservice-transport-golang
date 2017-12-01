@@ -418,6 +418,107 @@ func ExampleCloudService_Dial() {
 	}
 }
 
+func ExampleCloudService_Dial_post() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	postData := map[string]string{
+		"foo": "bar",
+		"baz": "qux",
+	}
+
+	postBody := new(bytes.Buffer)
+	json.NewEncoder(postBody).Encode(postData)
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Body:     ioutil.NopCloser(postBody),
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
+func ExampleCloudService_Dial_query() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Query: url.Values{
+			"foo": []string{"bar"},
+			"baz": []string{"qux"},
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
+func ExampleCloudService_Dial_headers() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Headers: map[string]string{
+			"Content-Type":    "application/json",
+			"Accept-Language": "en-GB",
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
 func ExampleCloudService_Call() {
 	// Instantiate the service.
 	myService := &CloudService{
@@ -437,6 +538,200 @@ func ExampleCloudService_Call() {
 	myServiceThingsRequest := &Request{
 		Method:   http.MethodGet,
 		Resource: "things",
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleCloudService_Call_post() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	postData := map[string]string{
+		"foo": "bar",
+		"baz": "qux",
+	}
+
+	postBody := new(bytes.Buffer)
+	json.NewEncoder(postBody).Encode(postData)
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Body:     ioutil.NopCloser(postBody),
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleCloudService_Call_query() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Query: url.Values{
+			"foo": []string{"bar"},
+			"baz": []string{"qux"},
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleCloudService_Call_headers() {
+	// Instantiate the service.
+	myService := &CloudService{
+		Service: Service{
+			Branch:      "master",
+			Environment: "staging",
+			Namespace:   "services",
+			Name:        "myservice",
+		},
+		Credentials: &AuthCredentials{
+			Email:    "test@test.com",
+			Password: "1234",
+		},
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Headers: map[string]string{
+			"Content-Type":    "application/json",
+			"Accept-Language": "en-GB",
+		},
 	}
 
 	// Dial it up!

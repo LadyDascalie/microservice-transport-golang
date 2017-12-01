@@ -192,15 +192,9 @@ func TestService_Dial(t *testing.T) {
 				Method:   http.MethodPost,
 				Resource: "things",
 				Protocol: config.ProtocolHTTPS,
-				Headers: []Header{
-					{
-						Key:   "Content-Type",
-						Value: "application/json",
-					},
-					{
-						Key:   "Accept-Language",
-						Value: "en-GB",
-					},
+				Headers: map[string]string{
+					"Content-Type":    "application/json",
+					"Accept-Language": "en-GB",
 				},
 			},
 			expectedUrl: "https://myservice-master-staging.myservice/things",
@@ -230,9 +224,9 @@ func TestService_Dial(t *testing.T) {
 				t.Errorf("TestService_Dial: %s: expected %v got %v", tc.name, tc.expectedUrl, tc.service.CurrentRequest.URL.String())
 			}
 
-			for _, header := range tc.request.Headers {
-				if header.Value != tc.service.CurrentRequest.Header.Get(header.Key) {
-					t.Errorf("TestService_Dial: %s: expected %v got %v", tc.name, header.Value, tc.service.CurrentRequest.Header.Get(header.Key))
+			for key, value := range tc.request.Headers {
+				if value != tc.service.CurrentRequest.Header.Get(key) {
+					t.Errorf("TestService_Dial: %s: expected %v got %v", tc.name, value, tc.service.CurrentRequest.Header.Get(key))
 				}
 			}
 		})
@@ -298,6 +292,89 @@ func ExampleService_Dial() {
 	}
 }
 
+func ExampleService_Dial_post() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	postData := map[string]string{
+		"foo": "bar",
+		"baz": "qux",
+	}
+
+	postBody := new(bytes.Buffer)
+	json.NewEncoder(postBody).Encode(postData)
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Body:     ioutil.NopCloser(postBody),
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
+func ExampleService_Dial_query() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Query: url.Values{
+			"foo": []string{"bar"},
+			"baz": []string{"qux"},
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
+func ExampleService_Dial_headers() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Headers: map[string]string{
+			"Content-Type":    "application/json",
+			"Accept-Language": "en-GB",
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+}
+
 func ExampleService_Call() {
 	// Instantiate the service.
 	myService := &Service{
@@ -341,11 +418,187 @@ func ExampleService_Call() {
 	case http.StatusNotFound:
 		fmt.Println("response err: not found")
 
-	// 200 and 304 are all good.
+		// 200 and 304 are all good.
 	case http.StatusOK, http.StatusNotModified:
 		break
 
-	// Something somewhere broken!
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleService_Call_post() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	postData := map[string]string{
+		"foo": "bar",
+		"baz": "qux",
+	}
+
+	postBody := new(bytes.Buffer)
+	json.NewEncoder(postBody).Encode(postData)
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Body:     ioutil.NopCloser(postBody),
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleService_Call_query() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Query: url.Values{
+			"foo": []string{"bar"},
+			"baz": []string{"qux"},
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
+	default:
+		fmt.Println("response err: internal server error")
+	}
+}
+
+func ExampleService_Call_headers() {
+	// Instantiate the service.
+	myService := &Service{
+		Branch:      "master",
+		Name:        "myservice",
+		Environment: "staging",
+		Namespace:   "services",
+	}
+
+	// Prepare the request.
+	myServiceThingsRequest := &Request{
+		Method:   http.MethodPost,
+		Resource: "things",
+		Headers: map[string]string{
+			"Content-Type":    "application/json",
+			"Accept-Language": "en-GB",
+		},
+	}
+
+	// Dial it up!
+	err := myService.Dial(myServiceThingsRequest)
+	if err != nil {
+		fmt.Printf("dial err: %s", err)
+	}
+
+	// Do the request.
+	myServiceResp, err := myService.Call()
+	if err != nil {
+		fmt.Printf("call err: %s", err)
+	}
+
+	// Make sure we close the body once we're done.
+	defer myServiceResp.Body.Close()
+
+	// Decode response.
+	serviceResponse := response.Response{}
+	jsonErr := json.NewDecoder(myServiceResp.Body).Decode(&serviceResponse)
+	if jsonErr != nil {
+		fmt.Printf("decode err: %s", err)
+	}
+
+	// Handle any error codes.
+	switch serviceResponse.Code {
+	// Custom error for grants not found.
+	case http.StatusNotFound:
+		fmt.Println("response err: not found")
+
+		// 200 and 304 are all good.
+	case http.StatusOK, http.StatusNotModified:
+		break
+
+		// Something somewhere broken!
 	default:
 		fmt.Println("response err: internal server error")
 	}
