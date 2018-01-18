@@ -23,7 +23,7 @@ import (
 func TestCloudService_Dial(t *testing.T) {
 	// Start a HTTP server to act as a fake API gateway.
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		resp := response.New(http.StatusOK, response.StatusOk, "", &response.Data{
+		resp := response.New(http.StatusOK, "", &response.Data{
 			Type: "consumer",
 			Content: models.Consumer{
 				Tokens: []*models.Token{
@@ -58,7 +58,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -79,7 +81,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -100,7 +104,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -125,7 +131,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -150,7 +158,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -175,7 +185,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -200,7 +212,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",
@@ -229,7 +243,9 @@ func TestCloudService_Dial(t *testing.T) {
 					Environment: "staging",
 					Namespace:   "services",
 					Name:        "myservice",
+					Client:      DefaultHttpClient(),
 				},
+				Client: DefaultHttpClient(),
 				Credentials: &AuthCredentials{
 					Email:    "test@test.com",
 					Password: "1234",

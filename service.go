@@ -17,11 +17,23 @@ type Service struct {
 	Namespace      string        // Namespace of the service.
 	Name           string        // Name of the service.
 	Version        int           // Major API version of the service.
+	Client         *http.Client  // http client implementation
+}
+
+// NewService - prepares a new service with the provided parameters and client.
+func NewService(client *http.Client, branch, env, namespace, name string) *Service {
+	return &Service{
+		Branch:      branch,
+		Name:        name,
+		Environment: env,
+		Namespace:   namespace,
+		Client:      client,
+	}
 }
 
 // Call - Do the current service request.
-func (s *Service) Call(client *http.Client) (*http.Response, error) {
-	return client.Do(s.CurrentRequest)
+func (s *Service) Call() (*http.Response, error) {
+	return s.Client.Do(s.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
