@@ -26,7 +26,7 @@ type AuthCredentials struct {
 type CloudService struct {
 	Service                      // Inherit all properties of a normal service.
 	Credentials *AuthCredentials // Authentication credentials for cloud service calls.
-	Client *http.Client
+	Client      *http.Client
 }
 
 // NewCloudService - Prepare a new CloudService struct with the provided parameters.
@@ -37,8 +37,9 @@ func NewCloudService(client *http.Client, branch, env, namespace, name string, c
 			Environment: env,
 			Namespace:   namespace,
 			Name:        name,
+			Client:      client,
 		},
-		Client: client,
+		Client:      client,
 		Credentials: credentials,
 	}
 }
@@ -73,11 +74,11 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 	case http.StatusUnauthorized, http.StatusNotFound:
 		return nil, transportErrors.LoginUnauthorisedError{}
 
-	// 200 and 304 are all good.
+		// 200 and 304 are all good.
 	case http.StatusOK, http.StatusNotModified:
 		break
 
-	// Something somewhere broken!
+		// Something somewhere broken!
 	default:
 		return nil, fmt.Errorf("api gateway login failed: %s", serviceResponse.Message)
 	}
