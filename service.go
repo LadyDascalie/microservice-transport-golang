@@ -20,8 +20,8 @@ type Service struct {
 }
 
 // Call - Do the current service request.
-func (s *Service) Call() (*http.Response, error) {
-	return HTTPClient.Do(s.CurrentRequest)
+func (s *Service) Call(client *http.Client) (*http.Response, error) {
+	return client.Do(s.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
@@ -53,5 +53,16 @@ func (s *Service) Dial(request *Request) error {
 
 	// Create the request.
 	s.CurrentRequest, err = http.NewRequest(request.Method, resourceUrl, request.Body)
+
+	// Add the headers.
+	for key, value := range request.Headers {
+		s.CurrentRequest.Header.Set(key, value)
+	}
+
 	return err
+}
+
+// Dial - Get the name of the service
+func (s *Service) GetName() string {
+	return s.Name
 }

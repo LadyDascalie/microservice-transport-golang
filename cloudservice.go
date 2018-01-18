@@ -26,10 +26,11 @@ type AuthCredentials struct {
 type CloudService struct {
 	Service                      // Inherit all properties of a normal service.
 	Credentials *AuthCredentials // Authentication credentials for cloud service calls.
+	Client *http.Client
 }
 
 // NewCloudService - Prepare a new CloudService struct with the provided parameters.
-func NewCloudService(branch, env, namespace, name string, credentials *AuthCredentials) *CloudService {
+func NewCloudService(client *http.Client, branch, env, namespace, name string, credentials *AuthCredentials) *CloudService {
 	return &CloudService{
 		Service: Service{
 			Branch:      branch,
@@ -37,6 +38,7 @@ func NewCloudService(branch, env, namespace, name string, credentials *AuthCrede
 			Namespace:   namespace,
 			Name:        name,
 		},
+		Client: client,
 		Credentials: credentials,
 	}
 }
@@ -48,12 +50,12 @@ func (c *CloudService) authenticate(request *Request) (*models.Token, error) {
 		return nil, fmt.Errorf("cannot encode json: %s", err)
 	}
 
-	loginReq, err := http.NewRequest(http.MethodPost, c.GetApiGatewayUrl(request), loginBody)
+	loginReq, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/%s", c.GetApiGatewayUrl(request), "login"), loginBody)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build login request: %s", err)
 	}
 
-	loginResp, err := HTTPClient.Do(loginReq)
+	loginResp, err := c.Client.Do(loginReq)
 	if err != nil {
 		return nil, fmt.Errorf("cannot perform login request: %s", err)
 	}
@@ -111,7 +113,7 @@ func (c *CloudService) GetApiGatewayUrl(request *Request) string {
 
 // Call - Do the current service request.
 func (c *CloudService) Call() (*http.Response, error) {
-	return HTTPClient.Do(c.CurrentRequest)
+	return c.Client.Do(c.CurrentRequest)
 }
 
 // Dial - Create a request to a service resource.
@@ -156,5 +158,15 @@ func (c *CloudService) Dial(request *Request) error {
 		c.CurrentRequest.Header.Set(config.ServiceVersionHeader, strconv.Itoa(c.Version))
 	}
 
+	// Add the headers.
+	for key, value := range request.Headers {
+		c.CurrentRequest.Header.Set(key, value)
+	}
+
 	return nil
+}
+
+// Dial - Get the name of the service
+func (c *CloudService) GetName() string {
+	return c.Name
 }

@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
-var HTTPClient = &http.Client{
-	Timeout: 5 * time.Second,
+// DefaultHttpClient - returns a default http.Client implementation
+func DefaultHttpClient() *http.Client {
+	return &http.Client{
+		Timeout: 5 * time.Second,
+	}
 }
